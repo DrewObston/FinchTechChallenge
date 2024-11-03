@@ -29,7 +29,7 @@ function App() {
           const data = 
             {
               "provider_id": "gusto",
-              "products": ["company", "directory", "individual", "employment", "payment", "pay_statement"],
+              "products": ["company", "directory", "individual", "employment"],
               "employee_size": 10
             }
           
