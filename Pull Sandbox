@@ -6,7 +6,7 @@ curl https://sandbox.tryfinch.com/api/sandbox/create \
     "products": ["company", "directory", "individual", "employment"],
     "employee_size": 10
   }'
-
+,,,
 {
 	"payroll_provider_id": "gusto",
 	"company_id": "4620d0ad-5f45-45ec-aa1c-6adc92e4d46c",
@@ -74,6 +74,7 @@ page = client.hris.employments.retrieve_many(
     }, {
         "individual_id": "individual_id"
     }],
+,,,
 )
 page = page.responses[0]
 print(page.individual_id)
