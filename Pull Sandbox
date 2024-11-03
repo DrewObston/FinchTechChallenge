@@ -1,0 +1,17 @@
+curl https://sandbox.tryfinch.com/api/sandbox/create \
+  -X POST \
+  -H "Content-Type: application/json" \
+  --data-raw '{
+    "provider_id": "gusto",
+    "products": ["company", "directory", "individual", "employment", "payment", "pay_statement"],
+    "employee_size": 10
+  }'
+
+--Company--
+from finch import Finch
+
+client = Finch(
+    access_token="My Access Token",
+)
+company = client.hris.company.retrieve()
+print(company.id)
