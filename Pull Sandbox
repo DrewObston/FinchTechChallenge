@@ -3,15 +3,79 @@ curl https://sandbox.tryfinch.com/api/sandbox/create \
   -H "Content-Type: application/json" \
   --data-raw '{
     "provider_id": "gusto",
-    "products": ["company", "directory", "individual", "employment", "payment", "pay_statement"],
+    "products": ["company", "directory", "individual", "employment"],
     "employee_size": 10
   }'
 
---Company
+{
+	"payroll_provider_id": "gusto",
+	"company_id": "4620d0ad-5f45-45ec-aa1c-6adc92e4d46c",
+	"access_token": "<your_access_token>",
+	"sandbox_time": {
+		"unix": 1693319558697,
+		"calendar": "Tue Aug 29 2023 14:32:38 GMT+0000"
+	}
+}
+
+--Company--
 from finch import Finch
 
 client = Finch(
     access_token="My Access Token",
 )
 company = client.hris.company.retrieve()
-print(company.id)--
+print(company.id)
+
+--full employee directory--
+curl https://sandbox.tryfinch.com/api/employer/directory \
+  -H 'Authorization: Bearer <your_access_token>' \
+  -H 'Content-Type: application/json'
+
+from finch import Finch
+
+client = Finch(
+    access_token="My Access Token",
+)
+page = client.hris.directory.list()
+page = page.individuals[0]
+print(page.id)
+
+--Individual--
+from finch import Finch
+
+client = Finch(
+    access_token="My Access Token",
+)
+page = client.hris.individuals.retrieve_many()
+page = page.responses[0]
+print(page.individual_id)
+
+--Employment--
+curl --request POST \
+  --url https://sandbox.tryfinch.com/api/employer/employment \
+  --header 'Authorization: Bearer <your_access_token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"requests": [
+		{ "individual_id": "635bf8ef-5e77-4312-a2a5-e68eb2d9942d" }
+	]
+}'
+
+from finch import Finch
+
+client = Finch(
+    access_token="My Access Token",
+)
+page = client.hris.employments.retrieve_many(
+    requests=[{
+        "individual_id": "individual_id"
+    }, {
+        "individual_id": "individual_id"
+    }, {
+        "individual_id": "individual_id"
+    }],
+)
+page = page.responses[0]
+print(page.individual_id)
+
+
