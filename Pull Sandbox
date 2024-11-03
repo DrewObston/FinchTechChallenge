@@ -7,11 +7,11 @@ curl https://sandbox.tryfinch.com/api/sandbox/create \
     "employee_size": 10
   }'
 
---Company--
+--Company
 from finch import Finch
 
 client = Finch(
     access_token="My Access Token",
 )
 company = client.hris.company.retrieve()
-print(company.id)
+print(company.id)--
