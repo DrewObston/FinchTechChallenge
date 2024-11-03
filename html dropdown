@@ -1,0 +1,71 @@
+import React, { useState } from 'react';
+
+const Dropdown = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  // Sample options for the dropdown
+  const options = ['Option 1', 'Option 2', 'Option 3'];
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+    setIsOpen(false); // Close dropdown after selecting
+  };
+
+  return (
+    <div style={styles.dropdown}>
+      <button onClick={toggleDropdown} style={styles.button}>
+        {selectedOption || 'Select an option'}
+      </button>
+
+      {isOpen && (
+        <><div style={styles.menu}>
+          {options.map((option) => (
+            <div
+              key={option}
+              onClick={() => handleOptionClick(option)}
+              style={styles.menuItem}
+            >
+              {option}
+            </div>
+          ))}
+        </div><p>Value of options is {selectedOption}</p></>
+      )}
+    </div>
+  );
+};
+
+// Styles for dropdown elements
+const styles = {
+  dropdown: {
+    position: 'relative',
+    display: 'inline-block',
+  },
+  button: {
+    padding: '10px 20px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
+    backgroundColor: '#f5f5f5',
+  },
+  menu: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    zIndex: 1,
+    border: '1px solid #ccc',
+    backgroundColor: 'white',
+    borderRadius: '4px',
+    width: '100%',
+    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+  },
+  menuItem: {
+    padding: '10px',
+    cursor: 'pointer',
+  },
+};
