@@ -5,7 +5,35 @@ const Dropdown = () => {
   const [selectedOption, setSelectedOption] = useState(null);
 
   // Sample options for the dropdown
-  const options = ['Option 1', 'Option 2', 'Option 3'];
+  const options = [ADP Run - `adp_run`
+Bamboo HR - `bamboo_hr`
+Bamboo HR (API) - `bamboo_hr_api`
+HiBob - `bob`
+Gusto - `gusto`
+Humaans - `humaans`
+Insperity - `insperity`
+Justworks - `justworks`
+Namely - `namely`
+Paychex Flex - `paychex_flex`
+Paychex Flex (API) - `paychex_flex_api`
+Paycom - `paycom`
+Paycom (API) - `paycom_api`
+Paylocity - `paylocity`
+Paylocity (API) - `paylocity_api`
+Personio - `personio`
+Quickbooks - `quickbooks`
+Rippling - `rippling`
+Sage HR - `sage_hr`
+Sapling - `sapling`
+Squoia One - `sequoia_one`
+Square Payroll - `square_payroll`
+Trinet - `trinet`
+Trinet (API) - `trinet_api`
+Ulti Pro - `ulti_pro`
+Wave - `wave`
+Workday - `workday`
+Zenefits - `zenefits`
+Zenefits (API) - `zenefits_api`];
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
