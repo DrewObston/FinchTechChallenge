@@ -1,0 +1,138 @@
+import requests
+import json
+from typing import Dict, Any
+
+class FinchClient:
+    def __init__(self):
+        self.base_url = "https://sandbox.tryfinch.com/api"
+        self.access_token = None
+
+    def get_access_token(self, provider: str) -> None:
+        """
+        Get access token from Finch's Sandbox API using the specified provider.
+        Documentation: https://developer.tryfinch.com/docs/reference/bb5d1c2a31563-sandbox
+        """
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+        
+        data = {
+            "provider": provider,
+            "products": [
+                "company",
+                "directory",
+                "individual",
+                "employment"
+            ]
+        }
+
+        response = requests.post(
+            f"{self.base_url}/sandbox/create",
+            headers=headers,
+            json=data
+        )
+        
+        if response.status_code == 200:
+            self.access_token = response.json()["access_token"]
+        else:
+            raise Exception(f"Failed to get access token: {response.text}")
+
+    def get_company_data(self) -> Dict[str, Any]:
+        """Get company information."""
+        headers = self._get_auth_headers()
+        response = requests.get(f"{self.base_url}/employer/company", headers=headers)
+        return self._handle_response(response)
+
+    def get_directory_data(self) -> Dict[str, Any]:
+        """Get directory information for all employees."""
+        headers = self._get_auth_headers()
+        response = requests.get(f"{self.base_url}/employer/directory", headers=headers)
+        return self._handle_response(response)
+
+    def get_individual_data(self, individual_id: str) -> Dict[str, Any]:
+        """Get detailed information for a specific individual."""
+        headers = self._get_auth_headers()
+        data = {"requests": [{"individual_id": individual_id}]}
+        response = requests.post(
+            f"{self.base_url}/employer/individual",
+            headers=headers,
+            json=data
+        )
+        return self._handle_response(response)
+
+    def get_employment_data(self, individual_id: str) -> Dict[str, Any]:
+        """Get employment information for a specific individual."""
+        headers = self._get_auth_headers()
+        data = {"requests": [{"individual_id": individual_id}]}
+        response = requests.post(
+            f"{self.base_url}/employer/employment",
+            headers=headers,
+            json=data
+        )
+        return self._handle_response(response)
+
+    def _get_auth_headers(self) -> Dict[str, str]:
+        """Get headers with authorization token."""
+        if not self.access_token:
+            raise Exception("Access token not set. Call get_access_token first.")
+        
+        return {
+            "Accept": "application/json",
+            "Finch-Api-Version": "2020-09-17",
+            "Authorization": f"Bearer {self.access_token}"
+        }
+
+    def _handle_response(self, response: requests.Response) -> Dict[str, Any]:
+        """Handle API response and return JSON data."""
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"API request failed: {response.text}")
+
+def display_employer_data(client: FinchClient) -> None:
+    """Display all employer data in a formatted way."""
+    # Get company data
+    company_data = client.get_company_data()
+    print("\n=== Company Information ===")
+    print(json.dumps(company_data, indent=2))
+
+    # Get directory data
+    directory_data = client.get_directory_data()
+    print("\n=== Directory Information ===")
+    print(json.dumps(directory_data, indent=2))
+
+    # For each individual in the directory, get their detailed information
+    for individual in directory_data["individuals"]:
+        individual_id = individual["id"]
+        
+        # Get individual data
+        individual_data = client.get_individual_data(individual_id)
+        print(f"\n=== Individual Information for {individual_id} ===")
+        print(json.dumps(individual_data, indent=2))
+        
+        # Get employment data
+        employment_data = client.get_employment_data(individual_id)
+        print(f"\n=== Employment Information for {individual_id} ===")
+        print(json.dumps(employment_data, indent=2))
+
+def main():
+    # Initialize the client
+    client = FinchClient()
+    
+    # Available providers: "gusto", "bamboo_hr", "justworks", "workday", "paychex_flex"
+    provider = input("Enter the provider name (e.g., gusto, bamboo_hr): ").lower()
+    
+    # Get access token
+    try:
+        client.get_access_token(provider)
+        print(f"Successfully obtained access token for {provider}")
+        
+        # Display all employer data
+        display_employer_data(client)
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    main()
