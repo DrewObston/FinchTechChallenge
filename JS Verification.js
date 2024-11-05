@@ -1,4 +1,32 @@
 <script>
+
+        const TokenStore = {
+    getToken() {
+        return localStorage.getItem('finch_sandbox_token');
+    },
+
+    setToken(token) {
+        localStorage.setItem('finch_sandbox_token', token);
+    },
+
+    removeToken() {
+        localStorage.removeItem('finch_sandbox_token');
+    },
+
+    isTokenValid() {
+        const token = this.getToken();
+        if (!token) return false;
+        
+        try {
+            // Consider a better JWT exp check
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp > Date.now() / 1000;
+        } catch (e) {
+            return false;
+        }
+    }
+};
+        
         const fetchSandboxdata = async ( => {
             providerId,
             products = ["company", "directory", "individual", "employment"],
@@ -8,27 +36,18 @@
                 }
                 else{
                     console.log ("Requesting for new sandbox")
-                    const requestConfig = {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                     };
-                    const response = await fetch('https://sandbox.tryfinch.com/api/sandbox/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        provider_id: providerId,
-                        products: products,
-                        employee_size: employeeSize
-                    })
-                });
+                    const token = TokenStore.getToken();
+            
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+            const requestConfig = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            };
                 const data = await response.json();
                 return {
                     success: true,
@@ -46,13 +65,13 @@
             const errors = [];
             const warnings = [];
             
-            // Check if endpoint exists and has the expected structure
+            // Check if endpoint exists and has the expected data
             if (!data || !data.products) {
                 errors.push("Invalid response format");
                 return { errors, warnings };
             }
 
-            // Check each endpoint has null values or missing endpoints
+            // Check if endpoint has null values or missing endpoints
             const expectedProducts = ["company", "directory", "individual", "employment", "payment", "pay_statement"];
             
             expectedProducts.forEach(product => {
